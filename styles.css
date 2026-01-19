@@ -1,0 +1,285 @@
+/* =============================================
+   RESET & BASE STYLES
+   ============================================= */
+
+/* Remove default margin, padding, and set box-sizing for all elements */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Main body styling with dark gradient background */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); /* Dark blue gradient */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Page title styling */
+h1 {
+    color: #fff;
+    margin-bottom: 40px;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+/* =============================================
+   TIMER CONTAINER LAYOUT
+   ============================================= */
+
+/* Container that holds all active timers - uses flexbox for responsive layout */
+.timers-container {
+    display: flex;
+    flex-wrap: wrap;           /* Allow timers to wrap to next line on small screens */
+    justify-content: center;
+    gap: 30px;                 /* Space between each timer */
+    max-width: 900px;
+}
+
+/* Wrapper for individual timer - stacks timer circle, inputs, and controls vertically */
+.timer-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* =============================================
+   CIRCULAR TIMER DISPLAY
+   ============================================= */
+
+/* Container for the circular timer - sets fixed dimensions */
+.timer {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+/* Main circular timer element - dark background with centered content */
+.timer-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #0f0f23;       /* Dark inner circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/*
+   Progress ring around the timer circle
+   Uses a conic-gradient that rotates based on --progress CSS variable
+   The mask creates a ring effect by cutting out the center
+*/
+.timer-circle::before {
+    content: '';
+    position: absolute;
+    inset: 0;                  /* Fills entire parent */
+    border-radius: 50%;
+    padding: 8px;              /* Thickness of the progress ring */
+    background: conic-gradient(
+        from 0deg,
+        #00d4ff 0deg,                              /* Cyan color for active portion */
+        #00d4ff var(--progress, 360deg),           /* Progress controlled by CSS variable */
+        transparent var(--progress, 360deg),       /* Transparent for remaining portion */
+        transparent 360deg
+    );
+    /* Mask technique to create ring effect - shows only the border area */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: background 0.1s linear;
+}
+
+/* Warning state - orange color when 25% or less time remaining */
+.timer-circle.warning::before {
+    background: conic-gradient(
+        from 0deg,
+        #ffa500 0deg,
+        #ffa500 var(--progress, 360deg),
+        transparent var(--progress, 360deg),
+        transparent 360deg
+    );
+}
+
+/* Danger state - red color when 10% or less time remaining */
+.timer-circle.danger::before {
+    background: conic-gradient(
+        from 0deg,
+        #ff4757 0deg,
+        #ff4757 var(--progress, 360deg),
+        transparent var(--progress, 360deg),
+        transparent 360deg
+    );
+}
+
+/* Completed state - removes the progress ring */
+.timer-circle.completed::before {
+    background: none;
+}
+
+/* Time display text inside the circle (HH:MM:SS format) */
+.timer-display {
+    font-size: 28px;
+    color: #fff;
+    font-weight: 300;
+    letter-spacing: 2px;
+    z-index: 1;                /* Ensures text appears above the progress ring */
+}
+
+/* =============================================
+   TIMER CONTROL BUTTONS
+   ============================================= */
+
+/* Container for Start/Pause, Reset, and Remove buttons */
+.timer-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Base button styling for all timer controls */
+.timer-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;       /* Rounded pill shape */
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease; /* Smooth hover effect */
+}
+
+/* Start button - cyan color */
+.btn-start {
+    background: #00d4ff;
+    color: #0f0f23;
+}
+
+.btn-start:hover {
+    background: #00b8e6;
+}
+
+/* Pause button - orange color */
+.btn-pause {
+    background: #ffa500;
+    color: #0f0f23;
+}
+
+.btn-pause:hover {
+    background: #e69500;
+}
+
+/* Reset button - red color */
+.btn-reset {
+    background: #ff4757;
+    color: #fff;
+}
+
+.btn-reset:hover {
+    background: #ff3344;
+}
+
+/* Remove button - gray color */
+.btn-remove {
+    background: #6c757d;
+    color: #fff;
+}
+
+.btn-remove:hover {
+    background: #5a6268;
+}
+
+/* =============================================
+   TIME INPUT FIELDS
+   ============================================= */
+
+/* Container for hours, minutes, seconds input fields */
+.time-input-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+/* Individual time input field styling */
+.time-input {
+    width: 50px;
+    padding: 8px;
+    border: 2px solid #00d4ff;
+    border-radius: 8px;
+    background: #0f0f23;
+    color: #fff;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* Focus state for time inputs */
+.time-input:focus {
+    outline: none;
+    border-color: #00b8e6;
+}
+
+/* Colon separator between time inputs */
+.time-separator {
+    color: #00d4ff;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* =============================================
+   ADD TIMER BUTTONS
+   ============================================= */
+
+/* Container for the three "+" buttons to add new timers */
+.add-timer-container {
+    margin-top: 40px;
+    display: flex;
+    gap: 15px;
+}
+
+/* Circular "+" button styling */
+.add-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px dashed #00d4ff; /* Dashed border indicates "add" action */
+    background: transparent;
+    color: #00d4ff;
+    font-size: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover effect for add buttons - slight glow and scale up */
+.add-btn:hover:not(:disabled) {
+    background: rgba(0, 212, 255, 0.1);
+    transform: scale(1.1);
+}
+
+/* Disabled state when maximum timers reached */
+.add-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* =============================================
+   ANIMATIONS
+   ============================================= */
+
+/* Pulse animation played when timer completes */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Apply pulse animation to completed timer - plays 3 times */
+.timer-circle.completed {
+    animation: pulse 0.5s ease-in-out 3;
+}
