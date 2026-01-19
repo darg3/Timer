@@ -51,9 +51,9 @@ function playNotificationSound() {
         oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * noteDuration);
 
         // Volume envelope: quick attack, gradual decay
-        // Starts at 0, ramps to 0.8 (loud), then fades to 0.01
+        // Starts at 0, ramps to 0.5 (moderate), then fades to 0.01
         gainNode.gain.setValueAtTime(0, audioContext.currentTime + index * noteDuration);
-        gainNode.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + index * noteDuration + 0.02);
+        gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + index * noteDuration + 0.02);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * noteDuration + noteDuration);
 
         // Schedule note to play and stop
@@ -143,6 +143,7 @@ function createTimerElement(id) {
             <button class="timer-btn btn-reset" id="reset-btn-${id}" onclick="resetTimer(${id})">Reset</button>
             <button class="timer-btn btn-remove" onclick="removeTimer(${id})">Remove</button>
         </div>
+        <button class="timer-btn btn-dismiss" id="dismiss-btn-${id}" onclick="dismissAlarm(${id})" style="display: none;">Dismiss</button>
     `;
 
     return wrapper;
@@ -172,7 +173,8 @@ function addTimer() {
         totalSeconds: 0,      // Original duration set by user
         remainingSeconds: 0,  // Current countdown value
         intervalId: null,     // Reference to setInterval for stopping
-        isRunning: false      // Whether timer is currently counting down
+        isRunning: false,     // Whether timer is currently counting down
+        alarmIntervalId: null // Reference to alarm sound loop for stopping
     };
 
     timers.push(timer);
@@ -277,9 +279,33 @@ function tick(id) {
         startBtn.textContent = 'Start';
         startBtn.className = 'timer-btn btn-start';
 
-        // Play notification sound
+        // Show dismiss button
+        const dismissBtn = document.getElementById(`dismiss-btn-${id}`);
+        dismissBtn.style.display = 'block';
+
+        // Play notification sound immediately and then loop every 2 seconds
         playNotificationSound();
+        timer.alarmIntervalId = setInterval(() => playNotificationSound(), 2000);
     }
+}
+
+/**
+ * Dismisses the alarm sound for a completed timer
+ * @param {number} id - The timer ID to dismiss
+ */
+function dismissAlarm(id) {
+    const timer = timers.find(t => t.id === id);
+    if (!timer) return;
+
+    // Stop the looping alarm sound
+    if (timer.alarmIntervalId) {
+        clearInterval(timer.alarmIntervalId);
+        timer.alarmIntervalId = null;
+    }
+
+    // Hide the dismiss button
+    const dismissBtn = document.getElementById(`dismiss-btn-${id}`);
+    dismissBtn.style.display = 'none';
 }
 
 /**
@@ -296,6 +322,12 @@ function resetTimer(id) {
     timer.remainingSeconds = 0;
     timer.totalSeconds = 0;
 
+    // Stop alarm if playing
+    if (timer.alarmIntervalId) {
+        clearInterval(timer.alarmIntervalId);
+        timer.alarmIntervalId = null;
+    }
+
     // Get DOM elements
     const display = document.getElementById(`timer-display-${id}`);
     const circle = document.getElementById(`timer-circle-${id}`);
@@ -309,6 +341,10 @@ function resetTimer(id) {
     startBtn.textContent = 'Start';
     startBtn.className = 'timer-btn btn-start';
     inputGroup.style.display = 'flex';  // Show input fields again
+
+    // Hide dismiss button
+    const dismissBtn = document.getElementById(`dismiss-btn-${id}`);
+    dismissBtn.style.display = 'none';
 
     // Reset input field values
     document.getElementById(`hours-${id}`).value = 0;
@@ -326,6 +362,11 @@ function removeTimer(id) {
 
     // Stop any running countdown
     clearInterval(timer.intervalId);
+
+    // Stop alarm if playing
+    if (timer.alarmIntervalId) {
+        clearInterval(timer.alarmIntervalId);
+    }
 
     // Remove from timers array
     const index = timers.indexOf(timer);

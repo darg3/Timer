@@ -14,7 +14,9 @@ The timer should be in a circle and the margin of the circle should unwind, beca
 
 ## FEATURES
 
-A "+" button should allow the user to add 3 timers which can countdown at the same timepowershell -ExecutionPolicy Bypass -File claude.ps1
+- A "+" button should allow the user to add 3 timers which can countdown at the same timepowershell -ExecutionPolicy Bypass -File claude.ps1
+
+- Once the timer hits 00:00:00 the sound should keep playing untill the user clicks a "Dismiss" button that appears the moment the time hits 00:00:00
 
 ## OUTPUT
 

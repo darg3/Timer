@@ -194,6 +194,26 @@ h1 {
     background: #5a6268;
 }
 
+/* Dismiss button - bright green, larger and more prominent to stop alarm */
+.btn-dismiss {
+    background: #2ecc71;
+    color: #fff;
+    padding: 12px 28px;
+    font-size: 16px;
+    font-weight: bold;
+    animation: dismissPulse 0.6s ease-in-out infinite;
+}
+
+.btn-dismiss:hover {
+    background: #27ae60;
+}
+
+/* Pulsing animation to draw attention to the dismiss button */
+@keyframes dismissPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px 5px rgba(46, 204, 113, 0.5); }
+}
+
 /* =============================================
    TIME INPUT FIELDS
    ============================================= */
